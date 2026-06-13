@@ -113,10 +113,18 @@ function Index() {
   });
 
   const settings = siteData?.settings;
-  const activePallets = siteData?.pallets?.length ? siteData.pallets : pallets;
-  const activeVideos = siteData?.videos ?? [];
-  const activeTestimonials = siteData?.testimonials?.length ? siteData.testimonials : testimonials;
-  const activeFaqs = siteData?.faqs?.length ? siteData.faqs : faqs;
+  const activePallets = siteData?.pallets?.length
+    ? siteData.pallets.map((p) => ({ name: p.name, price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url }))
+    : pallets.map((p) => ({ ...p, image: null }));
+  const activeVideos = siteData?.videos?.length
+    ? siteData.videos.map((v) => ({ id: v.id, title: v.title, customer: v.customer_handle || v.title, views: v.views_label || "novo", subtitle: v.subtitle || "Pallet Surpresa", thumb: v.thumbnail_url, url: v.video_url || "#unboxings" }))
+    : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer: `@cliente${i + 1}`, views: `${120 + i * 23}k views`, subtitle: "Pallet Trader", thumb: null, url: "#unboxings" }));
+  const activeTestimonials = siteData?.testimonials?.length
+    ? siteData.testimonials.map((t) => ({ id: t.id, name: t.customer_name, city: t.city, text: t.content, rating: t.rating, avatar: t.avatar_url }))
+    : testimonials.map((t) => ({ ...t, id: t.name, avatar: null }));
+  const activeFaqs = siteData?.faqs?.length
+    ? siteData.faqs.map((f) => ({ id: f.id, q: f.question, a: f.answer }))
+    : faqs.map((f, i) => ({ ...f, id: String(i) }));
   const heroBanner = siteData?.banners?.find((b) => b.placement === "hero");
   const checkoutLink = settings?.checkout_url || "#pallets";
   const heroTitle = heroBanner?.title || settings?.hero_title || "COMPRE PALLETS SURPRESA E DESCUBRA O QUE ESTÁ ESCONDIDO";
@@ -218,24 +226,19 @@ function Index() {
             </div>
           </div>
           <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-            {activePallets.map((p) => {
-              const imageUrl = "image_url" in p ? p.image_url : null;
-              const tag = "badge" in p ? p.badge : p.tag;
-              const boxes = "min_boxes" in p ? `${p.min_boxes}–${p.max_boxes} caixas` : p.boxes;
-              const price = "price" in p && typeof p.price === "number" ? money(p.price) : p.price;
-              return (
+            {activePallets.map((p) => (
               <article key={p.name} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
                 <div className="relative aspect-square">
-                  <img src={imageUrl || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
-                  {tag && <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
-                    {String(tag).toUpperCase()}
+                  <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
+                  {p.tag && <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
+                    {String(p.tag).toUpperCase()}
                   </span>}
                 </div>
                 <div className="p-4">
                   <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
-                  <p className="text-xs text-white/60 mt-0.5">{boxes}</p>
+                  <p className="text-xs text-white/60 mt-0.5">{p.boxes}</p>
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="font-display font-black text-2xl text-brand">{price}</span>
+                    <span className="font-display font-black text-2xl text-brand">{p.price}</span>
                     <span className="text-xs text-white/50">à vista</span>
                   </div>
                   <a href={checkoutLink} className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center">
@@ -243,8 +246,7 @@ function Index() {
                   </a>
                 </div>
               </article>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>
