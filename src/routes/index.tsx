@@ -436,13 +436,6 @@ function Index() {
         </ul>
       </nav>
 
-      <CheckoutDialog
-        open={!!checkoutPallet}
-        onOpenChange={(v) => { if (!v) setCheckoutPallet(null); }}
-        pallet={checkoutPallet}
-        defaultOfferHash={(settings as any)?.tribopay_offer_hash}
-        defaultProductHash={(settings as any)?.tribopay_product_hash}
-      />
     </div>
   );
 }
