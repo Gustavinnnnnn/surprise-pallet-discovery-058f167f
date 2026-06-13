@@ -100,20 +100,20 @@ function CheckoutPage() {
       const res: any = await createTx({
         data: {
           amount: Number(price),
-          externalId: `pallet-${id ?? "x"}-${Date.now()}`,
-          payer: {
+          description: String(name || "Pallet"),
+          reference: `PALLET-${id ?? "x"}-${Date.now()}`,
+          customer: {
             name: form.name.trim(),
             email: form.email.trim(),
             document: onlyDigits(form.document),
-            phone: { number: onlyDigits(form.phone) },
+            phone: onlyDigits(form.phone),
           },
         },
       });
-      const pix = res?.data ?? res?.deposit ?? res?.pix ?? res;
       setPixData({
-        qr_code: pix?.qr_code || pix?.pix_qr_code || pix?.qrcode,
-        qr_code_image: pix?.qr_code_image || pix?.pix_qr_code_image || pix?.qrCodeImage || pix?.qrcode_image,
-        copy_paste: pix?.pix_copy_paste || pix?.copy_paste || pix?.qr_code || pix?.qrcode || pix?.emv,
+        qr_code: res?.qr_code,
+        qr_code_image: res?.qr_code_base64,
+        copy_paste: res?.qr_code,
       });
       toast.success("PIX gerado! Pague para confirmar.");
     } catch (e: any) {
