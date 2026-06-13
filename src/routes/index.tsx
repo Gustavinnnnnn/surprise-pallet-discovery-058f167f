@@ -422,3 +422,14 @@ function Index() {
     </div>
   );
 }
+
+function highlightDiscover(text: string) {
+  const marker = "DESCUBRA";
+  const index = text.toUpperCase().indexOf(marker);
+  if (index < 0) return text;
+  return <>{text.slice(0, index)}<span className="text-brand">{text.slice(index, index + marker.length)}</span>{text.slice(index + marker.length)}</>;
+}
+
+function money(value: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
+}
