@@ -61,13 +61,13 @@ export const createParadisePixTransaction = createServerFn({ method: "POST" })
       nested?.qr_code_base64 ?? nested?.qr_code_image ?? nested?.qrcode_image ?? nested?.qr_code_url;
 
     return {
-      ...b,
-      qr_code,
-      qr_code_base64,
-    } as {
-      qr_code?: string;
-      qr_code_base64?: string;
-      [k: string]: unknown;
+      qr_code: qr_code as string | undefined,
+      qr_code_base64: qr_code_base64 as string | undefined,
+      transaction_id: (b?.transaction_id ?? b?.id ?? nested?.transaction_id ?? nested?.id) as string | number | undefined,
+      amount: (b?.amount ?? nested?.amount) as number | undefined,
+      expires_at: (b?.expires_at ?? nested?.expires_at) as string | undefined,
+      raw: JSON.stringify(b),
     };
   });
+
 
