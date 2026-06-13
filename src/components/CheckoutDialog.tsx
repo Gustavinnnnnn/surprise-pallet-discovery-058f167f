@@ -114,7 +114,7 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
             state: form.state.trim().toUpperCase(),
           },
           cart: [{
-            product_hash,
+            product_hash: product_hash || undefined,
             title: pallet.name,
             price: amount,
             quantity: 1,
