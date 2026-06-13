@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -82,6 +84,52 @@ const faqs = [
 
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { data: siteData } = useQuery({
+    queryKey: ["public-site-content"],
+    queryFn: async () => {
+      const [settings, dbPallets, videos, dbTestimonials, dbFaqs, banners] = await Promise.all([
+        supabase.from("site_settings").select("*").limit(1).maybeSingle(),
+        supabase.from("pallets").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        supabase.from("site_videos").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        supabase.from("testimonials").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        supabase.from("faq_items").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        supabase.from("banners").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+      ]);
+      if (settings.error) throw settings.error;
+      if (dbPallets.error) throw dbPallets.error;
+      if (videos.error) throw videos.error;
+      if (dbTestimonials.error) throw dbTestimonials.error;
+      if (dbFaqs.error) throw dbFaqs.error;
+      if (banners.error) throw banners.error;
+      return {
+        settings: settings.data,
+        pallets: dbPallets.data ?? [],
+        videos: videos.data ?? [],
+        testimonials: dbTestimonials.data ?? [],
+        faqs: dbFaqs.data ?? [],
+        banners: banners.data ?? [],
+      };
+    },
+  });
+
+  const settings = siteData?.settings;
+  const activePallets = siteData?.pallets?.length
+    ? siteData.pallets.map((p) => ({ name: p.name, price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url }))
+    : pallets.map((p) => ({ ...p, image: null }));
+  const activeVideos = siteData?.videos?.length
+    ? siteData.videos.map((v) => ({ id: v.id, title: v.title, customer: v.customer_handle || v.title, views: v.views_label || "novo", subtitle: v.subtitle || "Pallet Surpresa", thumb: v.thumbnail_url, url: v.video_url || "#unboxings" }))
+    : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer: `@cliente${i + 1}`, views: `${120 + i * 23}k views`, subtitle: "Pallet Trader", thumb: null, url: "#unboxings" }));
+  const activeTestimonials = siteData?.testimonials?.length
+    ? siteData.testimonials.map((t) => ({ id: t.id, name: t.customer_name, city: t.city, text: t.content, rating: t.rating, avatar: t.avatar_url }))
+    : testimonials.map((t) => ({ ...t, id: t.name, avatar: null }));
+  const activeFaqs = siteData?.faqs?.length
+    ? siteData.faqs.map((f) => ({ id: f.id, q: f.question, a: f.answer }))
+    : faqs.map((f, i) => ({ ...f, id: String(i) }));
+  const heroBanner = siteData?.banners?.find((b) => b.placement === "hero");
+  const checkoutLink = settings?.checkout_url || "#pallets";
+  const heroTitle = heroBanner?.title || settings?.hero_title || "COMPRE PALLETS SURPRESA E DESCUBRA O QUE ESTÁ ESCONDIDO";
+  const heroSubtitle = heroBanner?.subtitle || settings?.hero_subtitle || "Produtos de logística reversa, devoluções e excesso de estoque. Cada pallet é uma nova oportunidade.";
+  const announcement = settings?.announcement || "ESTOQUE LIMITADO HOJE";
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20 md:pb-0">
@@ -90,7 +138,7 @@ function Index() {
         <div className="mx-auto max-w-6xl flex items-center justify-between px-4 h-14">
           <a href="#top" className="flex items-center gap-2 font-display font-extrabold text-lg">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-brand text-brand-foreground">P</span>
-            <span>PALLETS<span className="text-brand">SURPRESA</span></span>
+            <span>{settings?.site_name || "PALLETS"}<span className="text-brand">SURPRESA</span></span>
           </a>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             <a href="#pallets" className="hover:text-brand">Pallets</a>
@@ -124,20 +172,20 @@ function Index() {
 
       {/* HERO */}
       <section id="top" className="relative min-h-[100svh] flex items-center pt-14">
-        <img src={heroImg} alt="Pallets lacrados em armazém" className="absolute inset-0 w-full h-full object-cover" width={1280} height={1600} />
+        <img src={heroBanner?.image_url || heroImg} alt="Pallets lacrados em armazém" className="absolute inset-0 w-full h-full object-cover" width={1280} height={1600} />
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black" />
         <div className="relative mx-auto max-w-6xl w-full px-4 py-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-brand/15 border border-brand/40 px-3 py-1 text-xs font-bold tracking-wide text-brand">
-            <Flame size={14} /> ESTOQUE LIMITADO HOJE
+            <Flame size={14} /> {announcement}
           </span>
           <h1 className="mt-4 font-display font-black text-4xl sm:text-5xl md:text-7xl leading-[1.05] max-w-3xl">
-            COMPRE PALLETS SURPRESA E <span className="text-brand">DESCUBRA</span> O QUE ESTÁ ESCONDIDO
+            {highlightDiscover(heroTitle)}
           </h1>
           <p className="mt-4 text-base sm:text-lg text-white/80 max-w-xl">
-            Produtos de logística reversa, devoluções e excesso de estoque. Cada pallet é uma nova oportunidade.
+            {heroSubtitle}
           </p>
           <div className="mt-6 flex flex-col sm:flex-row gap-3 max-w-md">
-            <a href="#pallets" className="h-14 inline-flex items-center justify-center rounded-lg bg-brand text-brand-foreground font-display font-bold text-base px-6 hover:brightness-110 transition shadow-[0_10px_30px_-10px_#FF6B00]">
+            <a href={checkoutLink === "#pallets" ? "#pallets" : checkoutLink} className="h-14 inline-flex items-center justify-center rounded-lg bg-brand text-brand-foreground font-display font-bold text-base px-6 hover:brightness-110 transition shadow-[0_10px_30px_-10px_#FF6B00]">
               VER PALLETS DISPONÍVEIS <ChevronRight size={18} className="ml-1" />
             </a>
             <a href="#como" className="h-14 inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/5 font-display font-bold text-base px-6 hover:bg-white/10 transition">
@@ -178,13 +226,13 @@ function Index() {
             </div>
           </div>
           <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-            {pallets.map((p, i) => (
+            {activePallets.map((p) => (
               <article key={p.name} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
                 <div className="relative aspect-square">
-                  <img src={palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
-                  <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
-                    {p.tag.toUpperCase()}
-                  </span>
+                  <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
+                  {p.tag && <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
+                    {String(p.tag).toUpperCase()}
+                  </span>}
                 </div>
                 <div className="p-4">
                   <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
@@ -193,9 +241,9 @@ function Index() {
                     <span className="font-display font-black text-2xl text-brand">{p.price}</span>
                     <span className="text-xs text-white/50">à vista</span>
                   </div>
-                  <button className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition">
+                  <a href={checkoutLink} className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center">
                     COMPRAR AGORA
-                  </button>
+                  </a>
                 </div>
               </article>
             ))}
@@ -242,18 +290,18 @@ function Index() {
           <p className="mt-2 text-white/70">Veja clientes abrindo seus pallets.</p>
         </div>
         <div className="mt-6 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-gradient-to-br from-ink-3 to-black border border-white/10 relative overflow-hidden group">
-              <img src={palletImg} alt="Unboxing" loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
+          {activeVideos.map((video) => (
+            <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-gradient-to-br from-ink-3 to-black border border-white/10 relative overflow-hidden group">
+              <img src={video.thumb || palletImg} alt={video.title} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <button className="absolute inset-0 grid place-items-center">
+              <a href={video.url} className="absolute inset-0 grid place-items-center" aria-label={video.title}>
                 <span className="h-14 w-14 rounded-full bg-brand text-brand-foreground grid place-items-center shadow-xl">
                   <Play size={22} fill="currentColor" />
                 </span>
-              </button>
+              </a>
               <div className="absolute bottom-3 left-3 right-3 text-xs">
-                <div className="font-display font-bold">@cliente{i+1}</div>
-                <div className="text-white/70">Pallet Trader • {120 + i*23}k views</div>
+                <div className="font-display font-bold">{video.customer}</div>
+                <div className="text-white/70">{video.subtitle} • {video.views}</div>
               </div>
             </div>
           ))}
@@ -265,10 +313,12 @@ function Index() {
         <div className="mx-auto max-w-6xl px-4">
           <h2 className="font-display font-black text-3xl md:text-5xl">QUEM JÁ <span className="text-brand">RECEBEU</span></h2>
           <div className="mt-6 -mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-            {testimonials.map(t => (
-              <figure key={t.name} className="snap-center shrink-0 w-[85%] md:w-[32%] rounded-2xl bg-ink border border-white/5 p-5">
+            {activeTestimonials.map(t => (
+              <figure key={t.id} className="snap-center shrink-0 w-[85%] md:w-[32%] rounded-2xl bg-ink border border-white/5 p-5">
                 <div className="flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand to-orange-700" />
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand to-orange-700 overflow-hidden">
+                    {t.avatar && <img src={t.avatar} alt={t.name} className="h-full w-full object-cover" />}
+                  </div>
                   <div>
                     <div className="font-display font-bold">{t.name}</div>
                     <div className="text-xs text-white/60">{t.city}</div>
@@ -301,8 +351,8 @@ function Index() {
         <div className="mx-auto max-w-3xl px-4">
           <h2 className="font-display font-black text-3xl md:text-5xl text-center">PERGUNTAS <span className="text-brand">FREQUENTES</span></h2>
           <Accordion type="single" collapsible className="mt-6">
-            {faqs.map((f, i) => (
-              <AccordionItem key={i} value={`f${i}`} className="border-white/10">
+            {activeFaqs.map((f, i) => (
+              <AccordionItem key={f.id} value={`f${i}`} className="border-white/10">
                 <AccordionTrigger className="text-left font-display font-semibold text-base hover:no-underline">
                   {f.q}
                 </AccordionTrigger>
@@ -375,4 +425,15 @@ function Index() {
       </nav>
     </div>
   );
+}
+
+function highlightDiscover(text: string) {
+  const marker = "DESCUBRA";
+  const index = text.toUpperCase().indexOf(marker);
+  if (index < 0) return text;
+  return <>{text.slice(0, index)}<span className="text-brand">{text.slice(index, index + marker.length)}</span>{text.slice(index + marker.length)}</>;
+}
+
+function money(value: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
 }
