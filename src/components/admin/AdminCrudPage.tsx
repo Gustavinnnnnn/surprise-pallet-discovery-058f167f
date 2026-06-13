@@ -286,9 +286,12 @@ export function MediaUploadControl({ field, value, onChange }: { field: AdminFie
   async function handleFile(file: File) {
     setUploading(true);
     try {
-      const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+      if (file.size > 20 * 1024 * 1024) {
+        throw new Error("Arquivo muito grande. Envie um arquivo de até 20MB.");
+      }
+      const extension = sanitizeExtension(file.name, field.type === "video" ? "mp4" : "jpg");
       const folder = field.type === "video" ? "videos" : field.key.replace(/_url$/, "");
-      const path = `${folder}/${crypto.randomUUID()}.${extension}`;
+      const path = `${folder}/${Date.now()}-${makeId()}.${extension}`;
       const { error } = await supabase.storage.from("media").upload(path, file, {
         cacheControl: "3600",
         contentType: file.type,
@@ -346,4 +349,16 @@ function getErrorMessage(error: unknown, fallback: string) {
     return String((error as { message?: unknown }).message || fallback);
   }
   return fallback;
+}
+
+function makeId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2, 12);
+}
+
+function sanitizeExtension(fileName: string, fallback: string) {
+  const extension = fileName.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return extension || fallback;
 }
