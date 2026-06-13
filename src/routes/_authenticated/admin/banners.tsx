@@ -21,7 +21,7 @@ function BannersAdmin() {
         { key: "title", label: "Título", required: true },
         { key: "placement", label: "Posição", type: "select", options: [{ label: "Hero", value: "hero" }, { label: "Topo", value: "top" }, { label: "Meio", value: "middle" }, { label: "Rodapé", value: "bottom" }] },
         { key: "subtitle", label: "Subtítulo", span: "full" },
-        { key: "image_url", label: "URL da imagem", type: "url", span: "full" },
+        { key: "image_url", label: "Imagem do banner", type: "image", span: "full" },
         { key: "cta_label", label: "Texto do botão" },
         { key: "cta_url", label: "Link do botão" },
         { key: "sort_order", label: "Ordem", type: "number" },

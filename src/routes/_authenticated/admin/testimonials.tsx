@@ -23,7 +23,7 @@ function TestimonialsAdmin() {
         { key: "content", label: "Depoimento", type: "textarea", required: true, rows: 4, span: "full" },
         { key: "rating", label: "Nota", type: "number" },
         { key: "sort_order", label: "Ordem", type: "number" },
-        { key: "avatar_url", label: "URL da foto", type: "url", span: "full" },
+        { key: "avatar_url", label: "Foto do cliente", type: "image", span: "full" },
         { key: "is_active", label: "Status", type: "switch" },
       ]}
       columns={[

@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -263,6 +263,23 @@ export function MediaUploadControl({ field, value, onChange }: { field: AdminFie
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const accept = field.type === "video" ? "video/*" : "image/*";
+
+  useEffect(() => {
+    let alive = true;
+    if (!value || value.startsWith("http") || value.startsWith("blob:")) {
+      setPreviewUrl("");
+      return;
+    }
+    supabase.storage
+      .from("media")
+      .createSignedUrl(value, 60 * 60)
+      .then(({ data }) => {
+        if (alive) setPreviewUrl(data?.signedUrl ?? "");
+      });
+    return () => {
+      alive = false;
+    };
+  }, [value]);
 
   async function handleFile(file: File) {
     setUploading(true);
