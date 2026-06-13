@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createParadisePixTransaction } from "@/lib/paradise.functions";
-import { ensurePixQrImage, extractPixPaymentData } from "@/lib/pix-response";
+import { ensurePixQrImage, extractPixPaymentData, formatQrImageSrc } from "@/lib/pix-response";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
@@ -194,7 +194,7 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
             {!loading && pixData && (
               <>
                 {pixData.qr_code_image && (
-                  <img src={pixData.qr_code_image.startsWith("data:") ? pixData.qr_code_image : `data:image/png;base64,${pixData.qr_code_image}`}
+                  <img src={formatQrImageSrc(pixData.qr_code_image)}
                        alt="QR Code PIX" className="mx-auto w-56 h-56 bg-white p-2 rounded" />
                 )}
                 {pixData.copy_paste && (

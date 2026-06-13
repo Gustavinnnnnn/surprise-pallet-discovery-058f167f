@@ -108,3 +108,8 @@ export const ensurePixQrImage = async (pixData: PixPaymentData): Promise<PixPaym
   });
   return { ...pixData, qr_code_image };
 };
+
+export const formatQrImageSrc = (qrImage: string) => {
+  if (qrImage.startsWith("data:") || qrImage.startsWith("http://") || qrImage.startsWith("https://")) return qrImage;
+  return `data:image/png;base64,${qrImage}`;
+};

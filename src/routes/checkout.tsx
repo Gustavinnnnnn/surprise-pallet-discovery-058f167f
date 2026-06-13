@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { createParadisePixTransaction } from "@/lib/paradise.functions";
-import { ensurePixQrImage, extractPixPaymentData } from "@/lib/pix-response";
+import { ensurePixQrImage, extractPixPaymentData, formatQrImageSrc } from "@/lib/pix-response";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -219,7 +219,7 @@ function CheckoutPage() {
                 <div className="rounded-lg border border-border p-6 text-center space-y-4">
                   {pixData.qr_code_image && (
                     <img
-                      src={pixData.qr_code_image.startsWith("data:") ? pixData.qr_code_image : `data:image/png;base64,${pixData.qr_code_image}`}
+                      src={formatQrImageSrc(pixData.qr_code_image)}
                       alt="QR Code PIX" className="mx-auto w-64 h-64 bg-white p-2 rounded"
                     />
                   )}
