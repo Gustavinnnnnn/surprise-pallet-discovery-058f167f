@@ -314,7 +314,7 @@ function Index() {
           <h2 className="font-display font-black text-3xl md:text-5xl">QUEM JÁ <span className="text-brand">RECEBEU</span></h2>
           <div className="mt-6 -mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
             {activeTestimonials.map(t => (
-              <figure key={"id" in t ? t.id : t.name} className="snap-center shrink-0 w-[85%] md:w-[32%] rounded-2xl bg-ink border border-white/5 p-5">
+              <figure key={t.id} className="snap-center shrink-0 w-[85%] md:w-[32%] rounded-2xl bg-ink border border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand to-orange-700 overflow-hidden">
                     {t.avatar && <img src={t.avatar} alt={t.name} className="h-full w-full object-cover" />}
