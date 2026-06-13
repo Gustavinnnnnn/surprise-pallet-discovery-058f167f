@@ -67,7 +67,7 @@ function PalletsAdmin() {
       const payload = { ...p, description: p.description || null, image_url: p.image_url || null, badge: p.badge || null, promo_text: p.promo_text || null };
       if (p.id) {
         const { id, ...rest } = payload;
-        const { error } = await supabase.from("pallets").update(rest).eq("id", id);
+        const { error } = await supabase.from("pallets").update(rest).eq("id", id as string);
         if (error) throw error;
       } else {
         const { id: _ignored, ...rest } = payload;
