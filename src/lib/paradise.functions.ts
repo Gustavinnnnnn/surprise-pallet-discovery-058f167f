@@ -48,13 +48,26 @@ export const createParadisePixTransaction = createServerFn({ method: "POST" })
           `Paradise erro ${res.status}`,
       );
     }
-    return body as {
-      status?: string;
-      transaction_id?: number | string;
-      id?: string;
+    console.log("[Paradise] response keys:", Object.keys(body as any));
+
+    // Paradise pode retornar campos no root ou aninhados em data/pix/transaction
+    const b: any = body;
+    const nested = b?.data ?? b?.pix ?? b?.transaction ?? b?.response ?? {};
+    const qr_code =
+      b?.qr_code ?? b?.pix_code ?? b?.pix_copia_cola ?? b?.copy_paste ??
+      nested?.qr_code ?? nested?.pix_code ?? nested?.pix_copia_cola ?? nested?.copy_paste ?? nested?.emv;
+    const qr_code_base64 =
+      b?.qr_code_base64 ?? b?.qr_code_image ?? b?.qrcode_image ?? b?.qr_code_url ??
+      nested?.qr_code_base64 ?? nested?.qr_code_image ?? nested?.qrcode_image ?? nested?.qr_code_url;
+
+    return {
+      ...b,
+      qr_code,
+      qr_code_base64,
+    } as {
       qr_code?: string;
       qr_code_base64?: string;
-      amount?: number;
-      expires_at?: string;
+      [k: string]: unknown;
     };
   });
+
