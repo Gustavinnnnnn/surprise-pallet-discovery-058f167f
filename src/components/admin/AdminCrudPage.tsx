@@ -100,6 +100,7 @@ export function AdminCrudPage({
     onSuccess: () => {
       toast.success("Salvo com sucesso");
       qc.invalidateQueries({ queryKey: [queryKey] });
+      qc.invalidateQueries({ queryKey: ["public-site-content"] });
       setOpen(false);
       setForm(initialValues);
     },
@@ -114,6 +115,7 @@ export function AdminCrudPage({
     onSuccess: () => {
       toast.success("Excluído com sucesso");
       qc.invalidateQueries({ queryKey: [queryKey] });
+      qc.invalidateQueries({ queryKey: ["public-site-content"] });
     },
     onError: (e) => toast.error(getErrorMessage(e, "Erro ao excluir")),
   });
