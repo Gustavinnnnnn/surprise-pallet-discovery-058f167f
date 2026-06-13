@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { createTribopayTransaction } from "@/lib/tribopay.functions";
+import { createParadisePixTransaction } from "@/lib/paradise.functions";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
