@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
 import { Route as AuthenticatedAdminPalletsRouteImport } from './routes/_authenticated/admin/pallets'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
@@ -65,6 +66,12 @@ const AuthenticatedAdminSettingsRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminReportsRoute =
+  AuthenticatedAdminReportsRouteImport.update({
+    id: '/reports',
+    path: '/reports',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminPalletsRoute =
   AuthenticatedAdminPalletsRouteImport.update({
     id: '/pallets',
@@ -104,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/pallets': typeof AuthenticatedAdminPalletsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/pallets': typeof AuthenticatedAdminPalletsRoute
+  '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/pallets': typeof AuthenticatedAdminPalletsRoute
+  '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/orders'
     | '/admin/pallets'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/videos'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/orders'
     | '/admin/pallets'
+    | '/admin/reports'
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/videos'
@@ -177,6 +189,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/pallets'
+    | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/testimonials'
     | '/_authenticated/admin/videos'
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/pallets': {
       id: '/_authenticated/admin/pallets'
       path: '/pallets'
@@ -291,6 +311,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPalletsRoute: typeof AuthenticatedAdminPalletsRoute
+  AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminTestimonialsRoute: typeof AuthenticatedAdminTestimonialsRoute
   AuthenticatedAdminVideosRoute: typeof AuthenticatedAdminVideosRoute
@@ -304,6 +325,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminPalletsRoute: AuthenticatedAdminPalletsRoute,
+    AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminTestimonialsRoute: AuthenticatedAdminTestimonialsRoute,
     AuthenticatedAdminVideosRoute: AuthenticatedAdminVideosRoute,
