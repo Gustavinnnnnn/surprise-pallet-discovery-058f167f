@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import heroImg from "@/assets/hero-pallets.jpg";
 import palletImg from "@/assets/pallet-card.jpg";
+import { CheckoutDialog, type CheckoutPallet } from "@/components/CheckoutDialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -84,6 +85,7 @@ const faqs = [
 
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [checkoutPallet, setCheckoutPallet] = useState<CheckoutPallet | null>(null);
   const { data: siteData } = useQuery({
     queryKey: ["public-site-content"],
     queryFn: async () => {
@@ -120,8 +122,8 @@ function Index() {
 
   const settings = siteData?.settings;
   const activePallets = siteData?.pallets?.length
-    ? siteData.pallets.map((p) => ({ name: p.name, price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url }))
-    : pallets.map((p) => ({ ...p, image: null }));
+    ? siteData.pallets.map((p) => ({ id: p.id, name: p.name, priceNum: Number(p.price), price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url, offer_hash: (p as any).tribopay_offer_hash, product_hash: (p as any).tribopay_product_hash }))
+    : pallets.map((p) => ({ ...p, id: p.name, priceNum: Number(String(p.price).replace(/[^\d]/g, "")) / 100, image: null, offer_hash: null, product_hash: null }));
   const activeVideos = siteData?.videos?.length
     ? siteData.videos.map((v) => ({ id: v.id, title: v.title, customer: v.customer_handle || v.title, views: v.views_label || "novo", subtitle: v.subtitle || "Pallet Surpresa", thumb: v.thumbnail_url, url: v.video_url || "#unboxings" }))
     : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer: `@cliente${i + 1}`, views: `${120 + i * 23}k views`, subtitle: "Pallet Trader", thumb: null, url: "#unboxings" }));
@@ -247,9 +249,13 @@ function Index() {
                     <span className="font-display font-black text-2xl text-brand">{p.price}</span>
                     <span className="text-xs text-white/50">à vista</span>
                   </div>
-                  <a href={checkoutLink} className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutPallet({ id: p.id, name: p.name, price: p.priceNum, offer_hash: p.offer_hash, product_hash: p.product_hash, image: p.image })}
+                    className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
+                  >
                     COMPRAR AGORA
-                  </a>
+                  </button>
                 </div>
               </article>
             ))}
@@ -429,6 +435,14 @@ function Index() {
           ))}
         </ul>
       </nav>
+
+      <CheckoutDialog
+        open={!!checkoutPallet}
+        onOpenChange={(v) => { if (!v) setCheckoutPallet(null); }}
+        pallet={checkoutPallet}
+        defaultOfferHash={(settings as any)?.tribopay_offer_hash}
+        defaultProductHash={(settings as any)?.tribopay_product_hash}
+      />
     </div>
   );
 }
