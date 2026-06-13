@@ -41,12 +41,7 @@ export const Route = createFileRoute("/api/public/paradise-webhook")({
             await supabaseAdmin
               .from("orders")
               .update({ status: newStatus, updated_at: new Date().toISOString() })
-              .eq("external_id", ref);
-          } else if (transaction_id) {
-            await supabaseAdmin
-              .from("orders")
-              .update({ status: newStatus, updated_at: new Date().toISOString() })
-              .eq("provider_transaction_id", String(transaction_id));
+              .eq("order_number", ref);
           }
 
           console.log("[Paradise webhook]", { ref, transaction_id, status, newStatus });

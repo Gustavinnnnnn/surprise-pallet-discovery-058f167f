@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicTribopayWebhookRouteImport } from './routes/api/public/tribopay-webhook'
+import { Route as ApiPublicParadiseWebhookRouteImport } from './routes/api/public/paradise-webhook'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedAdminTestimonialsRouteImport } from './routes/_authenticated/admin/testimonials'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
@@ -59,6 +60,12 @@ const ApiPublicTribopayWebhookRoute =
   ApiPublicTribopayWebhookRouteImport.update({
     id: '/api/public/tribopay-webhook',
     path: '/api/public/tribopay-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicParadiseWebhookRoute =
+  ApiPublicParadiseWebhookRouteImport.update({
+    id: '/api/public/paradise-webhook',
+    path: '/api/public/paradise-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedAdminVideosRoute =
@@ -129,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/tribopay-webhook': typeof ApiPublicTribopayWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -145,6 +153,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/tribopay-webhook': typeof ApiPublicTribopayWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -164,6 +173,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/testimonials': typeof AuthenticatedAdminTestimonialsRoute
   '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
+  '/api/public/paradise-webhook': typeof ApiPublicParadiseWebhookRoute
   '/api/public/tribopay-webhook': typeof ApiPublicTribopayWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/videos'
+    | '/api/public/paradise-webhook'
     | '/api/public/tribopay-webhook'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/testimonials'
     | '/admin/videos'
+    | '/api/public/paradise-webhook'
     | '/api/public/tribopay-webhook'
     | '/admin'
   id:
@@ -217,6 +229,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/testimonials'
     | '/_authenticated/admin/videos'
+    | '/api/public/paradise-webhook'
     | '/api/public/tribopay-webhook'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -226,6 +239,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CheckoutRoute: typeof CheckoutRoute
+  ApiPublicParadiseWebhookRoute: typeof ApiPublicParadiseWebhookRoute
   ApiPublicTribopayWebhookRoute: typeof ApiPublicTribopayWebhookRoute
 }
 
@@ -278,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/tribopay-webhook'
       fullPath: '/api/public/tribopay-webhook'
       preLoaderRoute: typeof ApiPublicTribopayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/paradise-webhook': {
+      id: '/api/public/paradise-webhook'
+      path: '/api/public/paradise-webhook'
+      fullPath: '/api/public/paradise-webhook'
+      preLoaderRoute: typeof ApiPublicParadiseWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/videos': {
@@ -394,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CheckoutRoute: CheckoutRoute,
+  ApiPublicParadiseWebhookRoute: ApiPublicParadiseWebhookRoute,
   ApiPublicTribopayWebhookRoute: ApiPublicTribopayWebhookRoute,
 }
 export const routeTree = rootRouteImport
