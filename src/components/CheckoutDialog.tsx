@@ -81,57 +81,41 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
 
   const handlePay = async () => {
     if (!pallet) return;
-    const offer_hash = pallet.offer_hash || defaultOfferHash;
-    const product_hash = pallet.product_hash || defaultProductHash;
     setPixData(null);
     setPaymentError(null);
-    if (!offer_hash) {
-      setStep("pagamento");
-      setPaymentError("Pagamento indisponível: cadastre o Offer Hash da TriboPay no admin para gerar o PIX.");
-      toast.error("Offer Hash da TriboPay pendente no admin.");
-      return;
-    }
     setLoading(true);
     setStep("pagamento");
     try {
-      const amount = Math.round(Number(pallet.price) * 100);
+      const amount = Number(pallet.price);
       const res: any = await createTx({
         data: {
           amount,
-          offer_hash,
-          payment_method: "pix",
-          customer: {
+          externalId: `pallet-${pallet.id ?? "x"}-${Date.now()}`,
+          payer: {
             name: form.name.trim(),
             email: form.email.trim(),
-            phone_number: onlyDigits(form.phone),
             document: onlyDigits(form.document),
-            zip_code: onlyDigits(form.zip_code),
-            street_name: form.street.trim(),
-            number: form.number.trim(),
-            complement: form.complement.trim() || undefined,
-            neighborhood: form.neighborhood.trim() || undefined,
-            city: form.city.trim(),
-            state: form.state.trim().toUpperCase(),
+            phone: { number: onlyDigits(form.phone) },
           },
-          cart: [{
-            product_hash: product_hash || undefined,
-            title: pallet.name,
-            price: amount,
-            quantity: 1,
-            operation_type: 1,
-            tangible: true,
-            cover: pallet.image || undefined,
-          }],
-          expire_in_days: 1,
         },
       });
-      const pix = res?.data ?? res?.pix ?? res?.transaction?.pix ?? res;
+      const pix = res?.data ?? res?.deposit ?? res?.pix ?? res;
       setPixData({
-        qr_code: pix?.qr_code || pix?.pix_qr_code,
-        qr_code_image: pix?.qr_code_image || pix?.pix_qr_code_image,
-        copy_paste: pix?.pix_copy_paste || pix?.qr_code || pix?.copy_paste,
+        qr_code: pix?.qr_code || pix?.pix_qr_code || pix?.qrcode,
+        qr_code_image:
+          pix?.qr_code_image ||
+          pix?.pix_qr_code_image ||
+          pix?.qrCodeImage ||
+          pix?.qrcode_image,
+        copy_paste:
+          pix?.pix_copy_paste ||
+          pix?.copy_paste ||
+          pix?.qr_code ||
+          pix?.qrcode ||
+          pix?.emv,
       });
       toast.success("PIX gerado! Pague para confirmar.");
+
     } catch (e: any) {
       const message = e?.message || "Erro ao gerar pagamento";
       setPaymentError(message);
