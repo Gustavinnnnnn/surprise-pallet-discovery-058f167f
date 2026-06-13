@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Package, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, HelpCircle, Image, LayoutDashboard, MessageSquare, Package, PlaySquare, Settings, ShoppingCart, LogOut, Menu, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -54,6 +54,14 @@ function AdminLayout() {
   const nav = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/pallets", label: "Pallets", icon: Package },
+    { to: "/admin/orders", label: "Pedidos", icon: ShoppingCart },
+    { to: "/admin/customers", label: "Clientes", icon: Users },
+    { to: "/admin/videos", label: "Vídeos", icon: PlaySquare },
+    { to: "/admin/testimonials", label: "Depoimentos", icon: MessageSquare },
+    { to: "/admin/faq", label: "FAQ", icon: HelpCircle },
+    { to: "/admin/banners", label: "Banners", icon: Image },
+    { to: "/admin/settings", label: "Configurações", icon: Settings },
+    { to: "/admin/reports", label: "Relatórios", icon: BarChart3 },
   ];
 
   return (
