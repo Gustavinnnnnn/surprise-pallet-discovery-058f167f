@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ImagePlus, Pencil, Plus, Search, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-type FieldType = "text" | "email" | "tel" | "url" | "number" | "textarea" | "switch" | "select";
+type FieldType = "text" | "email" | "tel" | "url" | "number" | "textarea" | "switch" | "select" | "image" | "video";
 
 export type AdminField = {
   key: string;
@@ -219,7 +219,7 @@ export function AdminCrudPage({
 }
 
 function FieldControl({ field, value, onChange }: { field: AdminField; value: unknown; onChange: (value: unknown) => void }) {
-  const wrapperClass = field.span === "full" || field.type === "textarea" || field.type === "switch" ? "md:col-span-2" : "";
+  const wrapperClass = field.span === "full" || field.type === "textarea" || field.type === "switch" || field.type === "image" || field.type === "video" ? "md:col-span-2" : "";
 
   return (
     <div className={wrapperClass}>
@@ -242,6 +242,8 @@ function FieldControl({ field, value, onChange }: { field: AdminField; value: un
             <option key={option.value} value={option.value}>{option.label}</option>
           ))}
         </select>
+      ) : field.type === "image" || field.type === "video" ? (
+        <MediaUploadControl field={field} value={String(value ?? "")} onChange={onChange} />
       ) : (
         <Input
           type={field.type ?? "text"}
@@ -253,6 +255,62 @@ function FieldControl({ field, value, onChange }: { field: AdminField; value: un
           className="bg-zinc-800 border-zinc-700"
         />
       )}
+    </div>
+  );
+}
+
+export function MediaUploadControl({ field, value, onChange }: { field: AdminField; value: string; onChange: (value: unknown) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const accept = field.type === "video" ? "video/*" : "image/*";
+
+  async function handleFile(file: File) {
+    setUploading(true);
+    try {
+      const extension = file.name.split(".").pop()?.toLowerCase() || "bin";
+      const folder = field.type === "video" ? "videos" : field.key.replace(/_url$/, "");
+      const path = `${folder}/${crypto.randomUUID()}.${extension}`;
+      const { error } = await supabase.storage.from("media").upload(path, file, {
+        cacheControl: "3600",
+        contentType: file.type,
+        upsert: false,
+      });
+      if (error) throw error;
+      onChange(path);
+      setPreviewUrl(URL.createObjectURL(file));
+      toast.success("Arquivo enviado");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro no upload");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const isImage = field.type === "image";
+
+  return (
+    <div className="space-y-2">
+      {isImage && (previewUrl || value) && (
+        <div className="h-32 w-full overflow-hidden rounded-md border border-zinc-700 bg-zinc-800">
+          <img src={previewUrl || value} alt={field.label} className="h-full w-full object-cover" />
+        </div>
+      )}
+      <label className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200 hover:border-[#FF6B00] hover:text-white">
+        {isImage ? <ImagePlus size={16} /> : <Upload size={16} />}
+        {uploading ? "Enviando..." : "Escolher arquivo"}
+        <input
+          type="file"
+          accept={accept}
+          disabled={uploading}
+          className="sr-only"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void handleFile(file);
+            event.currentTarget.value = "";
+          }}
+        />
+      </label>
+      {value && <p className="truncate text-[11px] text-zinc-500">Arquivo: {value}</p>}
     </div>
   );
 }
