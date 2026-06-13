@@ -15,6 +15,65 @@ const inputSchema = z.object({
   }),
 });
 
+const normalizeKey = (key: string) => key.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+const copyPasteKeys = new Set([
+  "qrcode",
+  "pixcode",
+  "pixcopiacola",
+  "copiacola",
+  "copypaste",
+  "emv",
+  "brcode",
+  "payload",
+]);
+
+const imageKeys = new Set([
+  "qrcodebase64",
+  "qrcodeimage",
+  "qrcodeurl",
+  "base64",
+  "image",
+]);
+
+const isLikelyPixCode = (value: string) =>
+  value.startsWith("000201") || value.includes("BR.GOV.BCB.PIX") || value.length > 80;
+
+const isLikelyQrImage = (value: string) =>
+  value.startsWith("data:image/") ||
+  value.startsWith("http://") ||
+  value.startsWith("https://") ||
+  value.startsWith("iVBOR") ||
+  value.startsWith("/9j/");
+
+const findPixFields = (input: unknown) => {
+  let qr_code: string | undefined;
+  let qr_code_base64: string | undefined;
+
+  const walk = (value: unknown, key = "") => {
+    if (!value) return;
+    if (typeof value === "string") {
+      const text = value.trim();
+      if (!text) return;
+      const normalizedKey = normalizeKey(key);
+      if (!qr_code_base64 && imageKeys.has(normalizedKey) && isLikelyQrImage(text)) qr_code_base64 = text;
+      if (!qr_code && copyPasteKeys.has(normalizedKey) && !isLikelyQrImage(text) && isLikelyPixCode(text)) qr_code = text;
+      if (!qr_code && !isLikelyQrImage(text) && isLikelyPixCode(text)) qr_code = text;
+      return;
+    }
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => walk(item, `${key}_${index}`));
+      return;
+    }
+    if (typeof value === "object") {
+      Object.entries(value as Record<string, unknown>).forEach(([childKey, childValue]) => walk(childValue, childKey));
+    }
+  };
+
+  walk(input);
+  return { qr_code, qr_code_base64 };
+};
+
 export const createParadisePixTransaction = createServerFn({ method: "POST" })
   .inputValidator((data: z.infer<typeof inputSchema>) => inputSchema.parse(data))
   .handler(async ({ data }) => {
@@ -50,15 +109,16 @@ export const createParadisePixTransaction = createServerFn({ method: "POST" })
     }
     console.log("[Paradise] response keys:", Object.keys(body as any));
 
-    // Paradise pode retornar campos no root ou aninhados em data/pix/transaction
+    // Paradise pode retornar campos no root, aninhados ou com nomes diferentes.
     const b: any = body;
     const nested = b?.data ?? b?.pix ?? b?.transaction ?? b?.response ?? {};
+    const detected = findPixFields(b);
     const qr_code =
       b?.qr_code ?? b?.pix_code ?? b?.pix_copia_cola ?? b?.copy_paste ??
-      nested?.qr_code ?? nested?.pix_code ?? nested?.pix_copia_cola ?? nested?.copy_paste ?? nested?.emv;
+      nested?.qr_code ?? nested?.pix_code ?? nested?.pix_copia_cola ?? nested?.copy_paste ?? nested?.emv ?? detected.qr_code;
     const qr_code_base64 =
       b?.qr_code_base64 ?? b?.qr_code_image ?? b?.qrcode_image ?? b?.qr_code_url ??
-      nested?.qr_code_base64 ?? nested?.qr_code_image ?? nested?.qrcode_image ?? nested?.qr_code_url;
+      nested?.qr_code_base64 ?? nested?.qr_code_image ?? nested?.qrcode_image ?? nested?.qr_code_url ?? detected.qr_code_base64;
 
     return {
       qr_code: qr_code as string | undefined,
