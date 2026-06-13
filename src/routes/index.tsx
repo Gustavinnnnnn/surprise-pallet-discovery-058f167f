@@ -249,9 +249,13 @@ function Index() {
                     <span className="font-display font-black text-2xl text-brand">{p.price}</span>
                     <span className="text-xs text-white/50">à vista</span>
                   </div>
-                  <a href={checkoutLink} className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setCheckoutPallet({ id: p.id, name: p.name, price: p.priceNum, offer_hash: p.offer_hash, product_hash: p.product_hash, image: p.image })}
+                    className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
+                  >
                     COMPRAR AGORA
-                  </a>
+                  </button>
                 </div>
               </article>
             ))}
