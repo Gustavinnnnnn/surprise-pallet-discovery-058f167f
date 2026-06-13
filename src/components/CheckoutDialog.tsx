@@ -36,6 +36,7 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
   const [step, setStep] = useState<Step>("dados");
   const [loading, setLoading] = useState(false);
   const [pixData, setPixData] = useState<{ qr_code?: string; qr_code_image?: string; copy_paste?: string } | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const [form, setForm] = useState({
@@ -47,7 +48,7 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const reset = () => {
-    setStep("dados"); setPixData(null); setLoading(false); setCopied(false);
+    setStep("dados"); setPixData(null); setPaymentError(null); setLoading(false); setCopied(false);
   };
 
   const validateDados = () => {
@@ -82,8 +83,12 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
     if (!pallet) return;
     const offer_hash = pallet.offer_hash || defaultOfferHash;
     const product_hash = pallet.product_hash || defaultProductHash;
-    if (!offer_hash || !product_hash) {
-      toast.error("Configuração TriboPay pendente. Avise o admin.");
+    setPixData(null);
+    setPaymentError(null);
+    if (!offer_hash) {
+      setStep("pagamento");
+      setPaymentError("Pagamento indisponível: cadastre o Offer Hash da TriboPay no admin para gerar o PIX.");
+      toast.error("Offer Hash da TriboPay pendente no admin.");
       return;
     }
     setLoading(true);
@@ -120,7 +125,7 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
           expire_in_days: 1,
         },
       });
-      const pix = res?.pix ?? res?.transaction?.pix ?? res;
+      const pix = res?.data ?? res?.pix ?? res?.transaction?.pix ?? res;
       setPixData({
         qr_code: pix?.qr_code || pix?.pix_qr_code,
         qr_code_image: pix?.qr_code_image || pix?.pix_qr_code_image,
@@ -128,8 +133,9 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
       });
       toast.success("PIX gerado! Pague para confirmar.");
     } catch (e: any) {
-      toast.error(e?.message || "Erro ao gerar pagamento");
-      setStep("endereco");
+      const message = e?.message || "Erro ao gerar pagamento";
+      setPaymentError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -230,7 +236,14 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
               </>
             )}
             {!loading && !pixData && (
-              <Button variant="outline" onClick={() => setStep("endereco")}><ArrowLeft className="size-4" />Voltar</Button>
+              <div className="space-y-3 text-left">
+                {paymentError && (
+                  <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-foreground">
+                    {paymentError}
+                  </div>
+                )}
+                <Button variant="outline" onClick={() => setStep("endereco")}><ArrowLeft className="size-4" />Voltar</Button>
+              </div>
             )}
           </div>
         )}
