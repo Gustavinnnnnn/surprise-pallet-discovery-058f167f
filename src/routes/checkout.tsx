@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
-import { createTribopayTransaction } from "@/lib/tribopay.functions";
+import { createParadisePixTransaction } from "@/lib/paradise.functions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ type Step = "dados" | "endereco" | "pagamento";
 function CheckoutPage() {
   const { id, name, price, image } = Route.useSearch();
   const navigate = useNavigate();
-  const createTx = useServerFn(createTribopayTransaction);
+  const createTx = useServerFn(createParadisePixTransaction);
 
   const [step, setStep] = useState<Step>("dados");
   const [loading, setLoading] = useState(false);
@@ -100,20 +100,20 @@ function CheckoutPage() {
       const res: any = await createTx({
         data: {
           amount: Number(price),
-          externalId: `pallet-${id ?? "x"}-${Date.now()}`,
-          payer: {
+          description: String(name || "Pallet"),
+          reference: `PALLET-${id ?? "x"}-${Date.now()}`,
+          customer: {
             name: form.name.trim(),
             email: form.email.trim(),
             document: onlyDigits(form.document),
-            phone: { number: onlyDigits(form.phone) },
+            phone: onlyDigits(form.phone),
           },
         },
       });
-      const pix = res?.data ?? res?.deposit ?? res?.pix ?? res;
       setPixData({
-        qr_code: pix?.qr_code || pix?.pix_qr_code || pix?.qrcode,
-        qr_code_image: pix?.qr_code_image || pix?.pix_qr_code_image || pix?.qrCodeImage || pix?.qrcode_image,
-        copy_paste: pix?.pix_copy_paste || pix?.copy_paste || pix?.qr_code || pix?.qrcode || pix?.emv,
+        qr_code: res?.qr_code,
+        qr_code_image: res?.qr_code_base64,
+        copy_paste: res?.qr_code,
       });
       toast.success("PIX gerado! Pague para confirmar.");
     } catch (e: any) {
