@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { createParadisePixTransaction } from "@/lib/paradise.functions";
+import { ensurePixQrImage, extractPixPaymentData, formatQrImageSrc } from "@/lib/pix-response";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -110,11 +111,11 @@ function CheckoutPage() {
           },
         },
       });
-      setPixData({
-        qr_code: res?.qr_code,
-        qr_code_image: res?.qr_code_base64,
-        copy_paste: res?.qr_code,
-      });
+      const paymentData = await ensurePixQrImage(extractPixPaymentData(res));
+      if (!paymentData.copy_paste && !paymentData.qr_code_image) {
+        throw new Error("PIX gerado, mas a Paradise não retornou QR Code nem chave copia e cola.");
+      }
+      setPixData(paymentData);
       toast.success("PIX gerado! Pague para confirmar.");
     } catch (e: any) {
       const message = e?.message || "Erro ao gerar pagamento";
@@ -218,7 +219,7 @@ function CheckoutPage() {
                 <div className="rounded-lg border border-border p-6 text-center space-y-4">
                   {pixData.qr_code_image && (
                     <img
-                      src={pixData.qr_code_image.startsWith("data:") ? pixData.qr_code_image : `data:image/png;base64,${pixData.qr_code_image}`}
+                      src={formatQrImageSrc(pixData.qr_code_image)}
                       alt="QR Code PIX" className="mx-auto w-64 h-64 bg-white p-2 rounded"
                     />
                   )}
