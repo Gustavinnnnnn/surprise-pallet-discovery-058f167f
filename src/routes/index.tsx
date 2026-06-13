@@ -85,6 +85,7 @@ const faqs = [
 
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [checkoutPallet, setCheckoutPallet] = useState<CheckoutPallet | null>(null);
   const { data: siteData } = useQuery({
     queryKey: ["public-site-content"],
     queryFn: async () => {
