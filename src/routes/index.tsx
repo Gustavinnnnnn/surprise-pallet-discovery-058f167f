@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import heroImg from "@/assets/hero-pallets.jpg";
 import palletImg from "@/assets/pallet-card.jpg";
-import { CheckoutDialog, type CheckoutPallet } from "@/components/CheckoutDialog";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
