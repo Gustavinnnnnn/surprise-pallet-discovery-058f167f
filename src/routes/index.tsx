@@ -457,6 +457,6 @@ async function attachMediaUrls<T extends Record<string, unknown>>(rows: T[], key
 
 async function getMediaUrl(value: string) {
   if (!value || value.startsWith("http") || value.startsWith("data:") || value.startsWith("blob:")) return value || null;
-  const { data } = await supabase.storage.from("media").createSignedUrl(value, 60 * 60);
+  const { data } = await supabase.storage.from("media").createSignedUrl(value, 60 * 60 * 24 * 7);
   return data?.signedUrl ?? null;
 }

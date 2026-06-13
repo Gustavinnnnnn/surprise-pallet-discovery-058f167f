@@ -274,7 +274,7 @@ export function MediaUploadControl({ field, value, onChange }: { field: AdminFie
     }
     supabase.storage
       .from("media")
-      .createSignedUrl(value, 60 * 60)
+      .createSignedUrl(value, 60 * 60 * 24 * 7)
       .then(({ data }) => {
         if (alive) setPreviewUrl(data?.signedUrl ?? "");
       });
