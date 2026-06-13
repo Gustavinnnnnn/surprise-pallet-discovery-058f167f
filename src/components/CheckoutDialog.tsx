@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createParadisePixTransaction } from "@/lib/paradise.functions";
+import { ensurePixQrImage, extractPixPaymentData } from "@/lib/pix-response";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
@@ -100,11 +101,11 @@ export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, d
           },
         },
       });
-      setPixData({
-        qr_code: res?.qr_code,
-        qr_code_image: res?.qr_code_base64,
-        copy_paste: res?.qr_code,
-      });
+      const paymentData = await ensurePixQrImage(extractPixPaymentData(res));
+      if (!paymentData.copy_paste && !paymentData.qr_code_image) {
+        throw new Error("PIX gerado, mas a Paradise não retornou QR Code nem chave copia e cola.");
+      }
+      setPixData(paymentData);
       toast.success("PIX gerado! Pague para confirmar.");
 
     } catch (e: any) {
