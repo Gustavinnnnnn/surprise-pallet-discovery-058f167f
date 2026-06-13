@@ -67,8 +67,8 @@ export function AdminCrudPage({
   const { data = [], isLoading } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from(table as never)
+      const { data, error } = await (supabase as any)
+        .from(table)
         .select("*")
         .order(orderBy, { ascending: true });
       if (error) throw error;
@@ -89,11 +89,11 @@ export function AdminCrudPage({
       const payload = normalizePayload(beforeSave ? beforeSave(values) : values);
       if (payload.id) {
         const { id, ...rest } = payload;
-        const { error } = await supabase.from(table as never).update(rest as never).eq("id", id as string);
+        const { error } = await (supabase as any).from(table).update(rest).eq("id", id as string);
         if (error) throw error;
       } else {
         const { id: _ignored, ...rest } = payload;
-        const { error } = await supabase.from(table as never).insert(rest as never);
+        const { error } = await (supabase as any).from(table).insert(rest);
         if (error) throw error;
       }
     },
@@ -108,7 +108,7 @@ export function AdminCrudPage({
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table as never).delete().eq("id", id);
+      const { error } = await (supabase as any).from(table).delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
