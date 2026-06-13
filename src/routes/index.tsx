@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import heroImg from "@/assets/hero-pallets.jpg";
 import palletImg from "@/assets/pallet-card.jpg";
-import { CheckoutDialog, type CheckoutPallet } from "@/components/CheckoutDialog";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -85,7 +85,7 @@ const faqs = [
 
 function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [checkoutPallet, setCheckoutPallet] = useState<CheckoutPallet | null>(null);
+  
   const { data: siteData } = useQuery({
     queryKey: ["public-site-content"],
     queryFn: async () => {
@@ -249,13 +249,13 @@ function Index() {
                     <span className="font-display font-black text-2xl text-brand">{p.price}</span>
                     <span className="text-xs text-white/50">à vista</span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setCheckoutPallet({ id: p.id, name: p.name, price: p.priceNum, offer_hash: p.offer_hash, product_hash: p.product_hash, image: p.image })}
+                  <Link
+                    to="/checkout"
+                    search={{ id: String(p.id), name: p.name, price: p.priceNum, image: p.image || undefined }}
                     className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
                   >
                     COMPRAR AGORA
-                  </button>
+                  </Link>
                 </div>
               </article>
             ))}
@@ -436,13 +436,6 @@ function Index() {
         </ul>
       </nav>
 
-      <CheckoutDialog
-        open={!!checkoutPallet}
-        onOpenChange={(v) => { if (!v) setCheckoutPallet(null); }}
-        pallet={checkoutPallet}
-        defaultOfferHash={(settings as any)?.tribopay_offer_hash}
-        defaultProductHash={(settings as any)?.tribopay_product_hash}
-      />
     </div>
   );
 }
