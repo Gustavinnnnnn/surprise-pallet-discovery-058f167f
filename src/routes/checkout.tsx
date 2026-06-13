@@ -28,7 +28,7 @@ type Step = "dados" | "endereco" | "pagamento";
 function CheckoutPage() {
   const { id, name, price, image } = Route.useSearch();
   const navigate = useNavigate();
-  const createTx = useServerFn(createTribopayTransaction);
+  const createTx = useServerFn(createParadisePixTransaction);
 
   const [step, setStep] = useState<Step>("dados");
   const [loading, setLoading] = useState(false);
