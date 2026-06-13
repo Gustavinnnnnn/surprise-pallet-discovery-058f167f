@@ -101,13 +101,19 @@ function Index() {
       if (dbTestimonials.error) throw dbTestimonials.error;
       if (dbFaqs.error) throw dbFaqs.error;
       if (banners.error) throw banners.error;
+      const [signedPallets, signedVideos, signedTestimonials, signedBanners] = await Promise.all([
+        attachMediaUrls(dbPallets.data ?? [], ["image_url"]),
+        attachMediaUrls(videos.data ?? [], ["thumbnail_url", "video_url"]),
+        attachMediaUrls(dbTestimonials.data ?? [], ["avatar_url"]),
+        attachMediaUrls(banners.data ?? [], ["image_url"]),
+      ]);
       return {
         settings: settings.data,
-        pallets: dbPallets.data ?? [],
-        videos: videos.data ?? [],
-        testimonials: dbTestimonials.data ?? [],
+        pallets: signedPallets,
+        videos: signedVideos,
+        testimonials: signedTestimonials,
         faqs: dbFaqs.data ?? [],
-        banners: banners.data ?? [],
+        banners: signedBanners,
       };
     },
   });
@@ -436,4 +442,21 @@ function highlightDiscover(text: string) {
 
 function money(value: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value);
+}
+
+async function attachMediaUrls<T extends Record<string, unknown>>(rows: T[], keys: string[]) {
+  return Promise.all(
+    rows.map(async (row) => {
+      const signedEntries = await Promise.all(
+        keys.map(async (key) => [key, await getMediaUrl(String(row[key] ?? ""))] as const),
+      );
+      return { ...row, ...Object.fromEntries(signedEntries) };
+    }),
+  );
+}
+
+async function getMediaUrl(value: string) {
+  if (!value || value.startsWith("http") || value.startsWith("data:") || value.startsWith("blob:")) return value || null;
+  const { data } = await supabase.storage.from("media").createSignedUrl(value, 60 * 60);
+  return data?.signedUrl ?? null;
 }

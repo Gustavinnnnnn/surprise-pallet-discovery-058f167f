@@ -103,7 +103,7 @@ export function AdminCrudPage({
       setOpen(false);
       setForm(initialValues);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao salvar"),
+    onError: (e) => toast.error(getErrorMessage(e, "Erro ao salvar")),
   });
 
   const deleteMutation = useMutation({
@@ -115,7 +115,7 @@ export function AdminCrudPage({
       toast.success("Excluído com sucesso");
       qc.invalidateQueries({ queryKey: [queryKey] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Erro ao excluir"),
+    onError: (e) => toast.error(getErrorMessage(e, "Erro ao excluir")),
   });
 
   function startNew() {
@@ -297,7 +297,7 @@ export function MediaUploadControl({ field, value, onChange }: { field: AdminFie
       setPreviewUrl(URL.createObjectURL(file));
       toast.success("Arquivo enviado");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro no upload");
+      toast.error(getErrorMessage(error, "Erro no upload"));
     } finally {
       setUploading(false);
     }
@@ -336,4 +336,12 @@ function normalizePayload(values: Record<string, unknown>) {
   return Object.fromEntries(
     Object.entries(values).map(([key, value]) => [key, value === "" ? null : value]),
   );
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === "object" && error && "message" in error) {
+    return String((error as { message?: unknown }).message || fallback);
+  }
+  return fallback;
 }
