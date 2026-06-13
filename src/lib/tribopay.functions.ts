@@ -18,7 +18,7 @@ const customerSchema = z.object({
 });
 
 const cartItemSchema = z.object({
-  product_hash: z.string(),
+  product_hash: z.string().optional(),
   title: z.string(),
   price: z.number().int().positive(),
   quantity: z.number().int().positive(),
@@ -67,10 +67,24 @@ export const createTribopayTransaction = createServerFn({ method: "POST" })
       throw new Error("Dados do cartão são obrigatórios para credit_card");
     }
 
-    const res = await fetch(`${TRIBOPAY_URL}?api_token=${token}`, {
+    const payload = {
+      api_token: token,
+      transaction_origin: "api",
+      ...data,
+      cart: data.cart.map((item) => ({
+        offer_hash: data.offer_hash,
+        ...item,
+      })),
+    };
+
+    const res = await fetch(`${TRIBOPAY_URL}?api_token=${encodeURIComponent(token)}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ transaction_origin: "api", ...data }),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
     });
 
     const body = await res.json().catch(() => ({}));
