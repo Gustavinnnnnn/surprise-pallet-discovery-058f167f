@@ -16,7 +16,7 @@ function PalletsAdmin() {
       searchKeys={["name", "badge", "description"]}
       nameKey="name"
       emptyState="Nenhum pallet cadastrado. Clique em Novo para começar."
-      initialValues={{ name: "", price: 0, description: "", min_boxes: 1, max_boxes: 1, image_url: "", badge: "", promo_text: "", sort_order: 0, is_active: true }}
+      initialValues={{ name: "", price: 0, description: "", min_boxes: 1, max_boxes: 1, image_url: "", badge: "", promo_text: "", sort_order: 0, is_active: true, tribopay_offer_hash: "", tribopay_product_hash: "" }}
       fields={[
         { key: "name", label: "Nome", required: true },
         { key: "price", label: "Preço (R$)", type: "number", required: true },
@@ -26,6 +26,8 @@ function PalletsAdmin() {
         { key: "image_url", label: "Imagem do pallet", type: "image", span: "full" },
         { key: "badge", label: "Selo", placeholder: "MAIS VENDIDO" },
         { key: "promo_text", label: "Texto promo" },
+        { key: "tribopay_offer_hash", label: "TriboPay Offer Hash (opcional)" },
+        { key: "tribopay_product_hash", label: "TriboPay Product Hash (opcional)" },
         { key: "sort_order", label: "Ordem", type: "number" },
         { key: "is_active", label: "Status", type: "switch" },
       ]}
