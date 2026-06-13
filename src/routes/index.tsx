@@ -290,18 +290,18 @@ function Index() {
           <p className="mt-2 text-white/70">Veja clientes abrindo seus pallets.</p>
         </div>
         <div className="mt-6 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar">
-          {(activeVideos.length ? activeVideos : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer_handle: `@cliente${i + 1}`, views_label: `${120 + i * 23}k views`, thumbnail_url: null, subtitle: "Pallet Trader" }))).map((video) => (
+          {activeVideos.map((video) => (
             <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-gradient-to-br from-ink-3 to-black border border-white/10 relative overflow-hidden group">
-              <img src={video.thumbnail_url || palletImg} alt={video.title} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
+              <img src={video.thumb || palletImg} alt={video.title} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <a href={"video_url" in video && video.video_url ? video.video_url : "#unboxings"} className="absolute inset-0 grid place-items-center" aria-label={video.title}>
+              <a href={video.url} className="absolute inset-0 grid place-items-center" aria-label={video.title}>
                 <span className="h-14 w-14 rounded-full bg-brand text-brand-foreground grid place-items-center shadow-xl">
                   <Play size={22} fill="currentColor" />
                 </span>
               </a>
               <div className="absolute bottom-3 left-3 right-3 text-xs">
-                <div className="font-display font-bold">{video.customer_handle || video.title}</div>
-                <div className="text-white/70">{video.subtitle || "Pallet Surpresa"} • {video.views_label || "novo"}</div>
+                <div className="font-display font-bold">{video.customer}</div>
+                <div className="text-white/70">{video.subtitle} • {video.views}</div>
               </div>
             </div>
           ))}
@@ -317,17 +317,17 @@ function Index() {
               <figure key={"id" in t ? t.id : t.name} className="snap-center shrink-0 w-[85%] md:w-[32%] rounded-2xl bg-ink border border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-full bg-gradient-to-br from-brand to-orange-700 overflow-hidden">
-                    {"avatar_url" in t && t.avatar_url && <img src={t.avatar_url} alt={t.customer_name} className="h-full w-full object-cover" />}
+                    {t.avatar && <img src={t.avatar} alt={t.name} className="h-full w-full object-cover" />}
                   </div>
                   <div>
-                    <div className="font-display font-bold">{"customer_name" in t ? t.customer_name : t.name}</div>
+                    <div className="font-display font-bold">{t.name}</div>
                     <div className="text-xs text-white/60">{t.city}</div>
                   </div>
                 </div>
                 <div className="mt-3 flex gap-0.5 text-brand">
                   {Array.from({length:t.rating}).map((_,i)=><Star key={i} size={14} fill="currentColor" />)}
                 </div>
-                <blockquote className="mt-3 text-sm text-white/80">"{"content" in t ? t.content : t.text}"</blockquote>
+                <blockquote className="mt-3 text-sm text-white/80">"{t.text}"</blockquote>
               </figure>
             ))}
           </div>
@@ -352,11 +352,11 @@ function Index() {
           <h2 className="font-display font-black text-3xl md:text-5xl text-center">PERGUNTAS <span className="text-brand">FREQUENTES</span></h2>
           <Accordion type="single" collapsible className="mt-6">
             {activeFaqs.map((f, i) => (
-              <AccordionItem key={"id" in f ? f.id : i} value={`f${i}`} className="border-white/10">
+              <AccordionItem key={f.id} value={`f${i}`} className="border-white/10">
                 <AccordionTrigger className="text-left font-display font-semibold text-base hover:no-underline">
-                  {"question" in f ? f.question : f.q}
+                  {f.q}
                 </AccordionTrigger>
-                <AccordionContent className="text-white/70 text-sm">{"answer" in f ? f.answer : f.a}</AccordionContent>
+                <AccordionContent className="text-white/70 text-sm">{f.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
