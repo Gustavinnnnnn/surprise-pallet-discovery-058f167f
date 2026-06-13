@@ -32,7 +32,7 @@ type Step = "dados" | "endereco" | "pagamento";
 const onlyDigits = (s: string) => s.replace(/\D/g, "");
 
 export function CheckoutDialog({ open, onOpenChange, pallet, defaultOfferHash, defaultProductHash }: Props) {
-  const createTx = useServerFn(createTribopayTransaction);
+  const createTx = useServerFn(createParadisePixTransaction);
   const [step, setStep] = useState<Step>("dados");
   const [loading, setLoading] = useState(false);
   const [pixData, setPixData] = useState<{ qr_code?: string; qr_code_image?: string; copy_paste?: string } | null>(null);
