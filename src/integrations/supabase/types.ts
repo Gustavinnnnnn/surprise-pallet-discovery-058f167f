@@ -208,6 +208,8 @@ export type Database = {
           price: number
           promo_text: string | null
           sort_order: number
+          tribopay_offer_hash: string | null
+          tribopay_product_hash: string | null
           updated_at: string
         }
         Insert: {
@@ -223,6 +225,8 @@ export type Database = {
           price: number
           promo_text?: string | null
           sort_order?: number
+          tribopay_offer_hash?: string | null
+          tribopay_product_hash?: string | null
           updated_at?: string
         }
         Update: {
@@ -238,6 +242,8 @@ export type Database = {
           price?: number
           promo_text?: string | null
           sort_order?: number
+          tribopay_offer_hash?: string | null
+          tribopay_product_hash?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -253,6 +259,8 @@ export type Database = {
           id: string
           instagram_url: string | null
           site_name: string
+          tribopay_offer_hash: string | null
+          tribopay_product_hash: string | null
           updated_at: string
           whatsapp: string | null
         }
@@ -266,6 +274,8 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           site_name?: string
+          tribopay_offer_hash?: string | null
+          tribopay_product_hash?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
@@ -279,6 +289,8 @@ export type Database = {
           id?: string
           instagram_url?: string | null
           site_name?: string
+          tribopay_offer_hash?: string | null
+          tribopay_product_hash?: string | null
           updated_at?: string
           whatsapp?: string | null
         }
