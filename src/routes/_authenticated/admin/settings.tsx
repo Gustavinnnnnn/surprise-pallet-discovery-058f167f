@@ -16,13 +16,15 @@ function SettingsAdmin() {
       searchKeys={["site_name", "whatsapp", "email"]}
       nameKey="site_name"
       emptyState="Nenhuma configuração cadastrada."
-      initialValues={{ site_name: "Pallets Surpresa", whatsapp: "", email: "", instagram_url: "", checkout_url: "", announcement: "", hero_title: "", hero_subtitle: "" }}
+      initialValues={{ site_name: "Pallets Surpresa", whatsapp: "", email: "", instagram_url: "", checkout_url: "", announcement: "", hero_title: "", hero_subtitle: "", tribopay_offer_hash: "", tribopay_product_hash: "" }}
       fields={[
         { key: "site_name", label: "Nome do site", required: true },
         { key: "whatsapp", label: "WhatsApp", type: "tel" },
         { key: "email", label: "E-mail", type: "email" },
         { key: "instagram_url", label: "Instagram", type: "url" },
-        { key: "checkout_url", label: "Link de checkout", type: "url", span: "full" },
+        { key: "checkout_url", label: "Link de checkout (legado)", type: "url", span: "full" },
+        { key: "tribopay_offer_hash", label: "TriboPay — Offer Hash (padrão)" },
+        { key: "tribopay_product_hash", label: "TriboPay — Product Hash (padrão)" },
         { key: "announcement", label: "Aviso do topo", span: "full" },
         { key: "hero_title", label: "Título principal", type: "textarea", rows: 3, span: "full" },
         { key: "hero_subtitle", label: "Subtítulo principal", type: "textarea", rows: 3, span: "full" },
