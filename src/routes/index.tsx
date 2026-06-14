@@ -152,8 +152,8 @@ function Index() {
       <header className="fixed top-0 inset-x-0 z-50 bg-ink/90 backdrop-blur border-b border-white/5">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-4 h-14">
           <a href="#top" className="flex items-center gap-2 font-display font-extrabold text-lg">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-brand text-brand-foreground">P</span>
-            <span>{settings?.site_name || "PALLETS"}<span className="text-brand">SURPRESA</span></span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-brand text-brand-foreground">L</span>
+            <span>{settings?.site_name || "Logística Reversa"}</span>
           </a>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             <a href="#pallets" className="hover:text-brand">Pallets</a>
