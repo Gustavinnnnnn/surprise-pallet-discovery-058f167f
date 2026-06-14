@@ -19,7 +19,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: searchSchema,
-  head: () => ({ meta: [{ title: "Checkout — Pallets Surpresa" }] }),
+  head: () => ({ meta: [{ title: "Checkout — Logística Reversa" }] }),
   component: CheckoutPage,
 });
 

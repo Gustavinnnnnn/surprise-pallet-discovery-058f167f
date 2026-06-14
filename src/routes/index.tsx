@@ -16,10 +16,10 @@ import { Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pallets Surpresa — Descubra o que está escondido" },
-      { name: "description", content: "Compre pallets surpresa de logística reversa. Produtos variados, envio para todo o Brasil, compra 100% segura." },
-      { property: "og:title", content: "Pallets Surpresa — Descubra o que está escondido" },
-      { property: "og:description", content: "Compre pallets surpresa de logística reversa. Produtos variados, envio para todo o Brasil." },
+      { title: "Logística Reversa — Pallets surpresa com produtos reais" },
+      { name: "description", content: "Compre pallets de logística reversa. Produtos variados, envio para todo o Brasil, compra 100% segura." },
+      { property: "og:title", content: "Logística Reversa — Pallets surpresa" },
+      { property: "og:description", content: "Compre pallets de logística reversa. Produtos variados, envio para todo o Brasil." },
     ],
   }),
   component: Index,
@@ -152,8 +152,8 @@ function Index() {
       <header className="fixed top-0 inset-x-0 z-50 bg-ink/90 backdrop-blur border-b border-white/5">
         <div className="mx-auto max-w-6xl flex items-center justify-between px-4 h-14">
           <a href="#top" className="flex items-center gap-2 font-display font-extrabold text-lg">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-brand text-brand-foreground">P</span>
-            <span>{settings?.site_name || "PALLETS"}<span className="text-brand">SURPRESA</span></span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded bg-brand text-brand-foreground">L</span>
+            <span>{settings?.site_name || "Logística Reversa"}</span>
           </a>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium">
             <a href="#pallets" className="hover:text-brand">Pallets</a>
@@ -310,15 +310,19 @@ function Index() {
         </div>
         <div className="mt-6 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar">
           {activeVideos.map((video) => (
-            <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-gradient-to-br from-ink-3 to-black border border-white/10 relative overflow-hidden group">
-              <img src={video.thumb || palletImg} alt={video.title} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <a href={video.url} className="absolute inset-0 grid place-items-center" aria-label={video.title}>
-                <span className="h-14 w-14 rounded-full bg-brand text-brand-foreground grid place-items-center shadow-xl">
-                  <Play size={22} fill="currentColor" />
-                </span>
-              </a>
-              <div className="absolute bottom-3 left-3 right-3 text-xs">
+            <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-black border border-white/10 relative overflow-hidden group">
+              {video.url && video.url !== "#unboxings" ? (
+                <video
+                  src={video.url}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img src={palletImg} alt={video.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+              )}
+              <div className="pointer-events-none absolute bottom-0 inset-x-0 p-3 text-xs bg-gradient-to-t from-black/80 to-transparent">
                 <div className="font-display font-bold">{video.customer}</div>
                 <div className="text-white/70">{video.subtitle} • {video.views}</div>
               </div>
@@ -418,7 +422,7 @@ function Index() {
           </div>
         </div>
         <div className="mx-auto max-w-6xl mt-8 pt-6 border-t border-white/5 text-xs text-white/50 flex flex-col md:flex-row justify-between gap-2">
-          <span>© {new Date().getFullYear()} Pallets Surpresa. CNPJ 00.000.000/0001-00</span>
+          <span>© {new Date().getFullYear()} Logística Reversa.</span>
           <span>Logística reversa registrada.</span>
         </div>
       </footer>

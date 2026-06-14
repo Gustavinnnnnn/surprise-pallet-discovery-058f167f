@@ -16,7 +16,7 @@ function SettingsAdmin() {
       searchKeys={["site_name", "whatsapp", "email"]}
       nameKey="site_name"
       emptyState="Nenhuma configuração cadastrada."
-      initialValues={{ site_name: "Pallets Surpresa", whatsapp: "", email: "", instagram_url: "", checkout_url: "", announcement: "", hero_title: "", hero_subtitle: "", tribopay_offer_hash: "", tribopay_product_hash: "" }}
+      initialValues={{ site_name: "Logística Reversa", whatsapp: "", email: "", instagram_url: "", checkout_url: "", announcement: "", hero_title: "", hero_subtitle: "", tribopay_offer_hash: "", tribopay_product_hash: "" }}
       fields={[
         { key: "site_name", label: "Nome do site", required: true },
         { key: "whatsapp", label: "WhatsApp", type: "tel" },
