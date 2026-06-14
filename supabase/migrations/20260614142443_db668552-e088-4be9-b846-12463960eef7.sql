@@ -1,0 +1,2 @@
+UPDATE public.site_settings SET site_name = 'Logística Reversa' WHERE site_name = 'Pallets Surpresa' OR site_name IS NULL OR site_name = '';
+UPDATE public.site_videos SET thumbnail_url = NULL WHERE thumbnail_url IS NOT NULL;
