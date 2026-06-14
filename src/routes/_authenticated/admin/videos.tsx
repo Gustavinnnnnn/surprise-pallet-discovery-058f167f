@@ -16,13 +16,12 @@ function VideosAdmin() {
       searchKeys={["title", "customer_handle"]}
       nameKey="title"
       emptyState="Nenhum vídeo cadastrado."
-      initialValues={{ title: "", subtitle: "", customer_handle: "", views_label: "", video_url: "", thumbnail_url: "", sort_order: 0, is_active: true }}
+      initialValues={{ title: "", subtitle: "", customer_handle: "", views_label: "", video_url: "", sort_order: 0, is_active: true }}
       fields={[
         { key: "title", label: "Título", required: true },
         { key: "customer_handle", label: "Cliente / @", placeholder: "@cliente" },
         { key: "subtitle", label: "Legenda", span: "full" },
         { key: "video_url", label: "Arquivo do vídeo", type: "video", span: "full" },
-        { key: "thumbnail_url", label: "Capa do vídeo", type: "image", span: "full" },
         { key: "views_label", label: "Visualizações", placeholder: "120k views" },
         { key: "sort_order", label: "Ordem", type: "number" },
         { key: "is_active", label: "Status", type: "switch" },
