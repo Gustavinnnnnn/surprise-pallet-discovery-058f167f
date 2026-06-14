@@ -89,13 +89,14 @@ function Index() {
   const { data: siteData } = useQuery({
     queryKey: ["public-site-content"],
     queryFn: async () => {
-      const [settings, dbPallets, videos, dbTestimonials, dbFaqs, banners] = await Promise.all([
+      const [settings, dbPallets, videos, dbTestimonials, dbFaqs, banners, dbCategories] = await Promise.all([
         supabase.from("site_settings").select("*").limit(1).maybeSingle(),
         supabase.from("pallets").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("site_videos").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("testimonials").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("faq_items").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("banners").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        (supabase as any).from("pallet_categories").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
       ]);
       if (settings.error) throw settings.error;
       if (dbPallets.error) throw dbPallets.error;
@@ -116,6 +117,7 @@ function Index() {
         testimonials: signedTestimonials,
         faqs: dbFaqs.data ?? [],
         banners: signedBanners,
+        categories: (dbCategories?.data ?? []) as Array<{ id: string; name: string; description: string | null; sort_order: number }>,
       };
     },
   });
