@@ -124,8 +124,13 @@ function Index() {
 
   const settings = siteData?.settings;
   const activePallets = siteData?.pallets?.length
-    ? siteData.pallets.map((p) => ({ id: p.id, name: p.name, priceNum: Number(p.price), price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url, offer_hash: (p as any).tribopay_offer_hash, product_hash: (p as any).tribopay_product_hash }))
-    : pallets.map((p) => ({ ...p, id: p.name, priceNum: Number(String(p.price).replace(/[^\d]/g, "")) / 100, image: null, offer_hash: null, product_hash: null }));
+    ? siteData.pallets.map((p) => ({ id: p.id, name: p.name, priceNum: Number(p.price), price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url, offer_hash: (p as any).tribopay_offer_hash, product_hash: (p as any).tribopay_product_hash, category_id: (p as any).category_id as string | null }))
+    : pallets.map((p) => ({ ...p, id: p.name, priceNum: Number(String(p.price).replace(/[^\d]/g, "")) / 100, image: null, offer_hash: null, product_hash: null, category_id: null }));
+  const activeCategories = siteData?.categories ?? [];
+  const palletsByCategory = activeCategories
+    .map((c) => ({ category: c, items: activePallets.filter((p) => p.category_id === c.id) }))
+    .filter((g) => g.items.length > 0);
+  const uncategorized = activePallets.filter((p) => !p.category_id || !activeCategories.some((c) => c.id === p.category_id));
   const activeVideos = siteData?.videos?.length
     ? siteData.videos.map((v) => ({ id: v.id, title: v.title, customer: v.customer_handle || v.title, views: v.views_label || "novo", subtitle: v.subtitle || "Pallet Surpresa", thumb: v.thumbnail_url, url: v.video_url || "#unboxings" }))
     : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer: `@cliente${i + 1}`, views: `${120 + i * 23}k views`, subtitle: "Pallet Trader", thumb: null, url: "#unboxings" }));
