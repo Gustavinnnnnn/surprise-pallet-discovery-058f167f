@@ -233,42 +233,42 @@ function Index() {
 
       {/* PALLETS */}
       <section id="pallets" className="py-14 md:py-20">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex items-end justify-between mb-6">
+        <div className="mx-auto max-w-6xl px-4 space-y-12">
+          <div className="flex items-end justify-between">
             <div>
               <h2 className="font-display font-black text-3xl md:text-5xl">ESCOLHA SEU <span className="text-brand">PALLET</span></h2>
-              <p className="mt-2 text-white/70">Escolha o tamanho ideal para sua experiência.</p>
+              <p className="mt-2 text-white/70">Navegue pelas categorias e marcas disponíveis.</p>
             </div>
           </div>
-          <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-            {activePallets.map((p) => (
-              <article key={p.name} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
-                <div className="relative aspect-square">
-                  <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
-                  {p.tag && <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
-                    {String(p.tag).toUpperCase()}
-                  </span>}
+
+          {palletsByCategory.length === 0 && uncategorized.length > 0 && (
+            <PalletGrid items={uncategorized} />
+          )}
+
+          {palletsByCategory.map(({ category, items }) => (
+            <div key={category.id}>
+              <div className="mb-4 flex items-end justify-between">
+                <div>
+                  <h3 className="font-display font-black text-2xl md:text-3xl">{String(category.name).toUpperCase()}</h3>
+                  {category.description && <p className="mt-1 text-sm text-white/60">{category.description}</p>}
                 </div>
-                <div className="p-4">
-                  <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
-                  <p className="text-xs text-white/60 mt-0.5">{p.boxes}</p>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="font-display font-black text-2xl text-brand">{p.price}</span>
-                    <span className="text-xs text-white/50">à vista</span>
-                  </div>
-                  <Link
-                    to="/checkout"
-                    search={{ id: String(p.id), name: p.name, price: p.priceNum, image: p.image || undefined }}
-                    className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
-                  >
-                    COMPRAR AGORA
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                <span className="text-xs text-white/50">{items.length} {items.length === 1 ? "pallet" : "pallets"}</span>
+              </div>
+              <PalletGrid items={items} />
+            </div>
+          ))}
+
+          {palletsByCategory.length > 0 && uncategorized.length > 0 && (
+            <div>
+              <div className="mb-4">
+                <h3 className="font-display font-black text-2xl md:text-3xl">OUTROS</h3>
+              </div>
+              <PalletGrid items={uncategorized} />
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* COMO FUNCIONA */}
       <section id="como" className="py-14 md:py-20 bg-ink">
