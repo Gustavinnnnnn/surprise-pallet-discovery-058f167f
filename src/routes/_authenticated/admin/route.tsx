@@ -54,6 +54,7 @@ function AdminLayout() {
   const nav = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/pallets", label: "Pallets", icon: Package },
+    { to: "/admin/categories", label: "Categorias", icon: Package },
     { to: "/admin/orders", label: "Pedidos", icon: ShoppingCart },
     { to: "/admin/customers", label: "Clientes", icon: Users },
     { to: "/admin/videos", label: "Vídeos", icon: PlaySquare },

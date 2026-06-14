@@ -89,13 +89,14 @@ function Index() {
   const { data: siteData } = useQuery({
     queryKey: ["public-site-content"],
     queryFn: async () => {
-      const [settings, dbPallets, videos, dbTestimonials, dbFaqs, banners] = await Promise.all([
+      const [settings, dbPallets, videos, dbTestimonials, dbFaqs, banners, dbCategories] = await Promise.all([
         supabase.from("site_settings").select("*").limit(1).maybeSingle(),
         supabase.from("pallets").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("site_videos").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("testimonials").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("faq_items").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
         supabase.from("banners").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
+        (supabase as any).from("pallet_categories").select("*").eq("is_active", true).order("sort_order", { ascending: true }),
       ]);
       if (settings.error) throw settings.error;
       if (dbPallets.error) throw dbPallets.error;
@@ -116,14 +117,20 @@ function Index() {
         testimonials: signedTestimonials,
         faqs: dbFaqs.data ?? [],
         banners: signedBanners,
+        categories: (dbCategories?.data ?? []) as Array<{ id: string; name: string; description: string | null; sort_order: number }>,
       };
     },
   });
 
   const settings = siteData?.settings;
   const activePallets = siteData?.pallets?.length
-    ? siteData.pallets.map((p) => ({ id: p.id, name: p.name, priceNum: Number(p.price), price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url, offer_hash: (p as any).tribopay_offer_hash, product_hash: (p as any).tribopay_product_hash }))
-    : pallets.map((p) => ({ ...p, id: p.name, priceNum: Number(String(p.price).replace(/[^\d]/g, "")) / 100, image: null, offer_hash: null, product_hash: null }));
+    ? siteData.pallets.map((p) => ({ id: p.id, name: p.name, priceNum: Number(p.price), price: money(p.price), boxes: `${p.min_boxes}–${p.max_boxes} caixas`, tag: p.badge, image: p.image_url, offer_hash: (p as any).tribopay_offer_hash, product_hash: (p as any).tribopay_product_hash, category_id: (p as any).category_id as string | null }))
+    : pallets.map((p) => ({ ...p, id: p.name, priceNum: Number(String(p.price).replace(/[^\d]/g, "")) / 100, image: null, offer_hash: null, product_hash: null, category_id: null }));
+  const activeCategories = siteData?.categories ?? [];
+  const palletsByCategory = activeCategories
+    .map((c) => ({ category: c, items: activePallets.filter((p) => p.category_id === c.id) }))
+    .filter((g) => g.items.length > 0);
+  const uncategorized = activePallets.filter((p) => !p.category_id || !activeCategories.some((c) => c.id === p.category_id));
   const activeVideos = siteData?.videos?.length
     ? siteData.videos.map((v) => ({ id: v.id, title: v.title, customer: v.customer_handle || v.title, views: v.views_label || "novo", subtitle: v.subtitle || "Pallet Surpresa", thumb: v.thumbnail_url, url: v.video_url || "#unboxings" }))
     : Array.from({ length: 6 }).map((_, i) => ({ id: String(i), title: "Unboxing", customer: `@cliente${i + 1}`, views: `${120 + i * 23}k views`, subtitle: "Pallet Trader", thumb: null, url: "#unboxings" }));
@@ -226,42 +233,42 @@ function Index() {
 
       {/* PALLETS */}
       <section id="pallets" className="py-14 md:py-20">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex items-end justify-between mb-6">
+        <div className="mx-auto max-w-6xl px-4 space-y-12">
+          <div className="flex items-end justify-between">
             <div>
               <h2 className="font-display font-black text-3xl md:text-5xl">ESCOLHA SEU <span className="text-brand">PALLET</span></h2>
-              <p className="mt-2 text-white/70">Escolha o tamanho ideal para sua experiência.</p>
+              <p className="mt-2 text-white/70">Navegue pelas categorias e marcas disponíveis.</p>
             </div>
           </div>
-          <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
-            {activePallets.map((p) => (
-              <article key={p.name} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
-                <div className="relative aspect-square">
-                  <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
-                  {p.tag && <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
-                    {String(p.tag).toUpperCase()}
-                  </span>}
+
+          {palletsByCategory.length === 0 && uncategorized.length > 0 && (
+            <PalletGrid items={uncategorized} />
+          )}
+
+          {palletsByCategory.map(({ category, items }) => (
+            <div key={category.id}>
+              <div className="mb-4 flex items-end justify-between">
+                <div>
+                  <h3 className="font-display font-black text-2xl md:text-3xl">{String(category.name).toUpperCase()}</h3>
+                  {category.description && <p className="mt-1 text-sm text-white/60">{category.description}</p>}
                 </div>
-                <div className="p-4">
-                  <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
-                  <p className="text-xs text-white/60 mt-0.5">{p.boxes}</p>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="font-display font-black text-2xl text-brand">{p.price}</span>
-                    <span className="text-xs text-white/50">à vista</span>
-                  </div>
-                  <Link
-                    to="/checkout"
-                    search={{ id: String(p.id), name: p.name, price: p.priceNum, image: p.image || undefined }}
-                    className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
-                  >
-                    COMPRAR AGORA
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
+                <span className="text-xs text-white/50">{items.length} {items.length === 1 ? "pallet" : "pallets"}</span>
+              </div>
+              <PalletGrid items={items} />
+            </div>
+          ))}
+
+          {palletsByCategory.length > 0 && uncategorized.length > 0 && (
+            <div>
+              <div className="mb-4">
+                <h3 className="font-display font-black text-2xl md:text-3xl">OUTROS</h3>
+              </div>
+              <PalletGrid items={uncategorized} />
+            </div>
+          )}
         </div>
       </section>
+
 
       {/* COMO FUNCIONA */}
       <section id="como" className="py-14 md:py-20 bg-ink">
@@ -467,3 +474,48 @@ async function getMediaUrl(value: string) {
   const { data } = await supabase.storage.from("media").createSignedUrl(value, 60 * 60 * 24 * 7);
   return data?.signedUrl ?? null;
 }
+
+type PalletCardItem = {
+  id: string;
+  name: string;
+  priceNum: number;
+  price: string;
+  boxes: string;
+  tag: string | null;
+  image: string | null;
+};
+
+function PalletGrid({ items }: { items: PalletCardItem[] }) {
+  return (
+    <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
+      {items.map((p) => (
+        <article key={p.id} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
+          <div className="relative aspect-square">
+            <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
+            {p.tag && (
+              <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
+                {String(p.tag).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="p-4">
+            <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
+            <p className="text-xs text-white/60 mt-0.5">{p.boxes}</p>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display font-black text-2xl text-brand">{p.price}</span>
+              <span className="text-xs text-white/50">à vista</span>
+            </div>
+            <Link
+              to="/checkout"
+              search={{ id: String(p.id), name: p.name, price: p.priceNum, image: p.image || undefined }}
+              className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
+            >
+              COMPRAR AGORA
+            </Link>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+

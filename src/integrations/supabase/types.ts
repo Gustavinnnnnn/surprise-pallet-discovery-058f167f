@@ -194,9 +194,43 @@ export type Database = {
           },
         ]
       }
+      pallet_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pallets: {
         Row: {
           badge: string | null
+          category_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -214,6 +248,7 @@ export type Database = {
         }
         Insert: {
           badge?: string | null
+          category_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -231,6 +266,7 @@ export type Database = {
         }
         Update: {
           badge?: string | null
+          category_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -246,7 +282,15 @@ export type Database = {
           tribopay_product_hash?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pallets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "pallet_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_settings: {
         Row: {
