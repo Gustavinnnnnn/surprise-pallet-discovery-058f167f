@@ -422,7 +422,7 @@ function Index() {
           </div>
         </div>
         <div className="mx-auto max-w-6xl mt-8 pt-6 border-t border-white/5 text-xs text-white/50 flex flex-col md:flex-row justify-between gap-2">
-          <span>© {new Date().getFullYear()} Pallets Surpresa. CNPJ 00.000.000/0001-00</span>
+          <span>© {new Date().getFullYear()} Logística Reversa.</span>
           <span>Logística reversa registrada.</span>
         </div>
       </footer>
