@@ -11,8 +11,8 @@ function PalletsAdmin() {
   const { data: categories = [] } = useQuery({
     queryKey: ["admin-pallet-categories-options"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("pallet_categories" as any)
+      const { data, error } = await (supabase as any)
+        .from("pallet_categories")
         .select("id,name")
         .order("sort_order", { ascending: true });
       if (error) throw error;
