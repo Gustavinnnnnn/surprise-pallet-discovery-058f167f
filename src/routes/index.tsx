@@ -310,15 +310,19 @@ function Index() {
         </div>
         <div className="mt-6 px-4 flex gap-3 overflow-x-auto snap-x snap-mandatory no-scrollbar">
           {activeVideos.map((video) => (
-            <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-gradient-to-br from-ink-3 to-black border border-white/10 relative overflow-hidden group">
-              <img src={video.thumb || palletImg} alt={video.title} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <a href={video.url} className="absolute inset-0 grid place-items-center" aria-label={video.title}>
-                <span className="h-14 w-14 rounded-full bg-brand text-brand-foreground grid place-items-center shadow-xl">
-                  <Play size={22} fill="currentColor" />
-                </span>
-              </a>
-              <div className="absolute bottom-3 left-3 right-3 text-xs">
+            <div key={video.id} className="snap-start shrink-0 w-[60%] sm:w-[35%] md:w-[22%] aspect-[9/16] rounded-2xl bg-black border border-white/10 relative overflow-hidden group">
+              {video.url && video.url !== "#unboxings" ? (
+                <video
+                  src={video.url}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img src={palletImg} alt={video.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+              )}
+              <div className="pointer-events-none absolute bottom-0 inset-x-0 p-3 text-xs bg-gradient-to-t from-black/80 to-transparent">
                 <div className="font-display font-bold">{video.customer}</div>
                 <div className="text-white/70">{video.subtitle} • {video.views}</div>
               </div>
