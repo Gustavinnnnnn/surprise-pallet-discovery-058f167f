@@ -16,10 +16,10 @@ import { Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pallets Surpresa — Descubra o que está escondido" },
-      { name: "description", content: "Compre pallets surpresa de logística reversa. Produtos variados, envio para todo o Brasil, compra 100% segura." },
-      { property: "og:title", content: "Pallets Surpresa — Descubra o que está escondido" },
-      { property: "og:description", content: "Compre pallets surpresa de logística reversa. Produtos variados, envio para todo o Brasil." },
+      { title: "Logística Reversa — Pallets surpresa com produtos reais" },
+      { name: "description", content: "Compre pallets de logística reversa. Produtos variados, envio para todo o Brasil, compra 100% segura." },
+      { property: "og:title", content: "Logística Reversa — Pallets surpresa" },
+      { property: "og:description", content: "Compre pallets de logística reversa. Produtos variados, envio para todo o Brasil." },
     ],
   }),
   component: Index,
