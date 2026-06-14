@@ -474,3 +474,48 @@ async function getMediaUrl(value: string) {
   const { data } = await supabase.storage.from("media").createSignedUrl(value, 60 * 60 * 24 * 7);
   return data?.signedUrl ?? null;
 }
+
+type PalletCardItem = {
+  id: string;
+  name: string;
+  priceNum: number;
+  price: string;
+  boxes: string;
+  tag: string | null;
+  image: string | null;
+};
+
+function PalletGrid({ items }: { items: PalletCardItem[] }) {
+  return (
+    <div className="-mx-4 px-4 flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2">
+      {items.map((p) => (
+        <article key={p.id} className="snap-center shrink-0 w-[85%] sm:w-[55%] md:w-[28%] rounded-2xl overflow-hidden bg-ink border border-white/5 md:hover:border-brand/60 md:hover:-translate-y-1 transition">
+          <div className="relative aspect-square">
+            <img src={p.image || palletImg} alt={p.name} loading="lazy" width={800} height={800} className="absolute inset-0 w-full h-full object-cover" />
+            {p.tag && (
+              <span className="absolute top-3 left-3 rounded-full bg-brand text-brand-foreground text-[10px] font-bold tracking-wide px-2 py-1">
+                {String(p.tag).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div className="p-4">
+            <h3 className="font-display font-extrabold text-lg">{p.name}</h3>
+            <p className="text-xs text-white/60 mt-0.5">{p.boxes}</p>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display font-black text-2xl text-brand">{p.price}</span>
+              <span className="text-xs text-white/50">à vista</span>
+            </div>
+            <Link
+              to="/checkout"
+              search={{ id: String(p.id), name: p.name, price: p.priceNum, image: p.image || undefined }}
+              className="mt-4 w-full h-11 rounded-lg bg-brand text-brand-foreground font-display font-bold text-sm hover:brightness-110 transition inline-flex items-center justify-center"
+            >
+              COMPRAR AGORA
+            </Link>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
